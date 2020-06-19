@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: webmagic
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://[MYSQL-IP]:3306/spider?characterEncoding=utf-8&amp&serverTimezone=Asia/Shanghai&amp&useSSL=false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+  jackson:
+    time-zone: GMT+8
+    locale: zh_CN
+    date-format: yyyy-MM-dd
+    deserialization:
+      ACCEPT_SINGLE_VALUE_AS_ARRAY: true
+      FAIL_ON_UNKNOWN_PROPERTIES: false
+    property-naming-strategy: CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
+  redis:
+    host: [REDIS-IP]
+    database: 0
+    password:
+    port: 6379
+  task:
+    scheduling:
+      rule:
+        bilibili: "0 * * * * *"
+        zhihu: "30 * * * * *"
+        baidu: "*/5 * * * * *"
+        weibo: "*/5 * * * * *"
+      delay: 0
+
+server:
+  port: 18080
+  servlet:
+    context-path: /webmagic
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    com.example.webmagic: debug
+    com:
+      alibaba:
+        nacos: warn
+
+output:
+  file-path-prefix:
+    bilibili: data
+    zhihu: data
