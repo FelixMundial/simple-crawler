@@ -2,10 +2,11 @@ package com.example.webmagic.pageprocessor;
 
 import com.example.webmagic.entity.zhihu.ZhihuBillboardNode;
 import com.example.webmagic.entity.zhihu.ZhihuHotItem;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.Page;
 
@@ -19,11 +20,11 @@ import static com.example.webmagic.constant.SpiderConstant.ZONEID_ASIA_SHANGHAI;
  * @author yinfelix
  * @date 2020/6/18
  */
+@Component
 @Slf4j
 public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem> {
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-            .enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @SneakyThrows
     @Override

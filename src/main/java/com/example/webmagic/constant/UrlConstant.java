@@ -18,6 +18,8 @@ public class UrlConstant {
 
     public static final String BASE_URL_DOULIST_PRIMARY = "https://m.douban.com/doulist/119825874/";
     public static final String BASE_URL_DOULIST_SECONDARY = "https://m.douban.com/doulist/119827658/";
+    public static final String BASE_URL_DOULIST_TEST1 = "https://m.douban.com/doulist/225516/";
+    public static final String BASE_URL_DOULIST_TEST2 = "https://m.douban.com/doulist/111168891/";
     public static final String BASE_URL_DOUBAN_API_V2 = "https://api.douban.com/v2/";
 
     public static final String[] DOUBAN_API_KEY = {"0b2bdeda43b5688921839c8ecb20399b", "0df993c66c0c636e29ecbb5344252a4a"};

@@ -16,10 +16,15 @@ public class DoubanDoulistPipeline extends SimpleListPersistencePipeline<String>
     private DoubanBookService bookService;
 
     @Override
-    public void process(String bookId) {
+    public void processEach(String bookId) {
+        boolean operationResult;
         /*
         todo: 此处根据是否在数据库中已连续存在该书籍id决定是否提前中止整个爬取
          */
-        bookService.registerBook(bookId);
+        if (bookId.matches("^\\d{1,}$")) {
+            do {
+                operationResult = bookService.registerBook(bookId);
+            } while (!operationResult);
+        }
     }
 }

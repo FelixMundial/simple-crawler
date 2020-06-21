@@ -37,9 +37,9 @@ public class ProxyRedisRepository {
         String previousIp = "";
 
         /*
-        若测试超过15分钟，则放弃继续获取
+        若测试超过10分钟，则放弃继续获取
          */
-        while (LocalDateTime.now().minusMinutes(15).isBefore(now)) {
+        while (LocalDateTime.now().minusMinutes(10).isBefore(now)) {
             response = HttpUtil.testHttpGet0(proxyPoolUrl);
             if (response != null && response.statusCode() == HttpStatus.OK.value()
                     && !previousIp.equals(response.body()) && ProxyUtil.validateIp((previousIp = response.body()))) {

@@ -18,14 +18,14 @@ public abstract class SimpleListPersistencePipeline<T> implements Pipeline {
      *
      * @param t 单个实体类对象
      */
-    public abstract void process(T t);
+    public abstract void processEach(T t);
 
     @Override
     public void process(ResultItems resultItems, Task task) {
         if (resultItems.getAll() != null && resultItems.getAll().size() > 0) {
             List<T> items = (List<T>) resultItems.getAll().values().stream().findFirst().get();
-            items.forEach(this::process);
-            log.debug(items.get(0).getClass().getSimpleName() + "数据持久化结束");
+            items.forEach(this::processEach);
+            log.info("{}集合持久化结束，共保存{}条记录", items.get(0).getClass().getSimpleName(), items.size());
         } else {
             log.error("暂未爬取到任何实体类对象，无法持久化！");
         }

@@ -35,6 +35,10 @@ public class SpiderBootstrapper {
                 .addPipeline(new JsonFilePipeline(dataOutputPathPrefix + "/" + LocalDateTime.now(ZoneId.of(ZONEID_ASIA_SHANGHAI))))
                 .addPipeline(pipeline);
 
+        /*
+        在第一次下载前强制刷新代理
+         */
+        proxyService.refreshDownloaderProxy(downloader);
         spider.setDownloader(downloader).run();
     }
 }

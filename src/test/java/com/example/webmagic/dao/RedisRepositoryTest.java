@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 class RedisRepositoryTest {
     @Autowired
-    private DoubanDoulistItemRedisRepository redisRepository;
+    private DoubanDoulistRedisRepository redisRepository;
 
     @Test
     void setBookId() {

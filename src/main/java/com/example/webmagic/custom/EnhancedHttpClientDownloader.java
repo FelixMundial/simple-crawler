@@ -50,9 +50,9 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
         if (httpResponse.getStatusLine().getStatusCode() != HttpConstant.StatusCode.CODE_200) {
             page.setDownloadSuccess(false);
             logger.warn("页面{}下载被拒绝: {}", request.getUrl(), httpResponse.getStatusLine());
-//            proxyService.refreshDownloaderProxy(this);
+            proxyService.refreshDownloaderProxy(this);
         } else {
-            logger.warn("🎉页面{}下载成功～", request.getUrl());
+            logger.info("🎉 页面{}下载成功～", request.getUrl());
             byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
             String contentType = httpResponse.getEntity().getContentType() == null ? "" : httpResponse.getEntity().getContentType().getValue();
             page.setBytes(bytes);
@@ -91,19 +91,38 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
     @SneakyThrows
     @Override
     protected void onError(Request request) {
-//        logger.warn(request.getUrl() + "连接超时！");
-        timeoutCount.incrementAndGet();
-//        timeoutUrls.add(request.getUrl());
-        /*
-        并发问题
-         */
-        if (getTimeoutCount().compareAndSet(SpiderConstant.RETRY_TIMES, 0)) {
-            logger.warn(request.getUrl() + "超时次数已达上限！");
+        if (proxyProvider != null) {
+            timeoutCount.incrementAndGet();
+//            timeoutUrls.add(request.getUrl());
+            proxyService.refreshDownloaderProxy(this);
             /*
-            todo: 若超时次数已达上限，则暂停爬取，或将本页面加入队列
+            并发问题
              */
-//            this.setProxyProvider(null);
-            Thread.sleep(5000);
+            if (getTimeoutCount().compareAndSet(SpiderConstant.RETRY_TIMES, 0)) {
+                logger.warn("{}超时次数已达上限！", request.getUrl());
+                /*
+                todo: 若超时次数已达上限，则暂停爬取，或将本页面加入队列
+                 */
+                Thread.sleep(SpiderConstant.BASE_SLEEP_INTERVAL);
+                if (!proxyService.refreshDownloaderProxy(this)) {
+                    logger.warn("暂时无法获取代理...");
+                    this.setProxyProvider(null);
+                }
+            }
+        } else {
+            /*
+            todo: 进行邮件提醒
+             */
+            logger.error("使用本机IP爬取失败");
+        }
+    }
+
+    @Override
+    protected void onSuccess(Request request) {
+        if (proxyProvider != null) {
+            logger.debug("下一次下载将沿用本次代理～");
+        } else {
+            logger.debug("尝试重新获取代理...");
             proxyService.refreshDownloaderProxy(this);
         }
     }
@@ -154,16 +173,11 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
         CloseableHttpResponse httpResponse = null;
         CloseableHttpClient httpClient = getHttpClient(task.getSite());
 
-        /*
-        每次下载前强制刷新代理
-         */
-        proxyService.refreshDownloaderProxy(this);
-
         Proxy proxy = proxyProvider != null ? proxyProvider.getProxy(task) : null;
         if (proxy != null) {
             logger.info("当前请求IP为：" + proxy.getHost() + ":" + proxy.getPort());
         } else {
-            logger.warn("本次爬取使用本机IP");
+            logger.warn("⚠️！！本次爬取暂时使用本机IP！！ ⚠️");
         }
         HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, task.getSite(), proxy);
         Page page = Page.fail();
@@ -175,7 +189,7 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
 //            logger.info("页面{}下载完成", request.getUrl());
             return page;
         } catch (IOException e) {
-            logger.warn("页面{}下载超时: {}", request.getUrl(), e.getMessage());
+            logger.debug("页面{}下载超时: {}", request.getUrl(), e.getMessage());
             onError(request);
             return page;
         } finally {

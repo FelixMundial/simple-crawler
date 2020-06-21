@@ -14,6 +14,7 @@ public class SpiderConstant {
     public static final int TIME_OUT = 10000;
 
     public static final String CHARSET_UTF_8 = "utf-8";
+    public static final String CHARSET_GB2312 = "gb2312";
 
     public static final String ZONEID_ASIA_SHANGHAI = "Asia/Shanghai";
     public static final int PAGE_LIMIT = 5;

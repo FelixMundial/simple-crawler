@@ -4,9 +4,7 @@ import com.example.webmagic.entity.douban.book.DoubanBook;
 import com.example.webmagic.service.DoubanBookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -31,17 +29,17 @@ public class DoubanDoulistSecondaryTask {
     todo: 调用api失败或写入数据库失败的书籍id分别存入zset（score值为失败次数），
      并在额外的任务中随机获取元素进行重试，成功则移除，失败则更新score值
      */
-    @Async
-    @Scheduled(cron = "0 */5 * * * *")
-    public void initDoubanApiTask() throws InterruptedException {
+//    @Async
+//    @Scheduled(cron = "0 */5 * * * *")
+    public void initDoubanApiTask() {
         boolean isTaskCompleted = false;
-        log.info("initDoubanApiTask()");
+        log.debug("initDoubanApiTask()");
         if (isRequestAllowed.get()) {
             String bookId = bookService.getBookToProcess();
             /*
-            是否存在需要处理的书籍；获取的字符串是否符合图书id格式
+            是否存在需要处理的书籍
              */
-            if (!StringUtils.isEmpty(bookId) && bookId.matches("^\\d{1,}$")) {
+            if (!StringUtils.isEmpty(bookId)) {
                 DoubanBook bookInfo = bookService.getBookInfo(bookId);
                 /*
                 是否成功获取图书信息
@@ -58,7 +56,6 @@ public class DoubanDoulistSecondaryTask {
                     } while (!result);
                 }
             }
-            Thread.sleep(5 * 60 * 1000);
             if (isTaskCompleted && isRequestAllowed.get()) {
                 bookId = bookService.getFailedBookToProcess();
                 /*
@@ -87,8 +84,8 @@ public class DoubanDoulistSecondaryTask {
     /**
      * 每十分钟监测该时间段内失败请求频率，以决定是否暂停api请求
      */
-    @Async
-    @Scheduled(cron = "0 */30 * * * *")
+//    @Async
+//    @Scheduled(cron = "0 */30 * * * *")
     public void initRequestBrakeCheck() {
         int failedRequests = bookService.getFailedRequests();
         if (failedRequests > FAILED_REQ_THRESHOLD) {

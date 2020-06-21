@@ -2,6 +2,7 @@ package com.example.webmagic.pageprocessor;
 
 import com.example.webmagic.entity.bilibili.BilibiliRankingItem;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.selector.Selectable;
 
@@ -18,6 +19,7 @@ import static com.example.webmagic.constant.SpiderConstant.ZONEID_ASIA_SHANGHAI;
  * @author yinfelix
  * @date 2020/6/15
  */
+@Component
 @Slf4j
 public class BilibiliRankingPageProcessor extends SimpleListPageProcessor<BilibiliRankingItem> {
     @Override

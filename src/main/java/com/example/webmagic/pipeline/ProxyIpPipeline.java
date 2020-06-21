@@ -24,7 +24,7 @@ public class ProxyIpPipeline extends SimpleListPersistencePipeline<ProxyIp> {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void process(ProxyIp proxyIp) {
+    public void processEach(ProxyIp proxyIp) {
         String ip = proxyIp.getIp();
         String ipPort = proxyIp.getIpPort();
 

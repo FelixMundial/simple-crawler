@@ -36,4 +36,5 @@ build/
 /src/main/resources/application-prod.yml
 
 **/*.json
-/data/spider_zhihu_hot.sql
+/data/**
+!/ddl

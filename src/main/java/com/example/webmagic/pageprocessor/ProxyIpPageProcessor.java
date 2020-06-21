@@ -25,9 +25,7 @@ import static com.example.webmagic.constant.SpiderConstant.*;
  */
 @Slf4j
 public class ProxyIpPageProcessor extends SimpleListPageProcessor<ProxyIp> {
-    private static final int SLEEP_INTERVAL = BASE_SLEEP_INTERVAL / 2;
-
-    private volatile AtomicInteger pageCounter = new AtomicInteger();
+    private final AtomicInteger pageCounter = new AtomicInteger();
 
     @Override
     public Collection<ProxyIp> fetchItems(Page page) {
@@ -74,9 +72,9 @@ public class ProxyIpPageProcessor extends SimpleListPageProcessor<ProxyIp> {
     @SneakyThrows
     @Override
     public void process(Page page) {
-        Thread.sleep(new Random().nextInt(SLEEP_INTERVAL + SLEEP_INTERVAL / 2));
+        Thread.sleep(new Random().nextInt(BASE_SLEEP_INTERVAL));
         if (page.getHtml() != null && pageCounter.getAndIncrement() < PAGE_LIMIT) {
-            final List<String> targetPages = page.getHtml().xpath("//div[@class='pagination']/a[@class='next_page']").links().all();
+            List<String> targetPages = page.getHtml().xpath("//div[@class='pagination']/a[@class='next_page']").links().all();
             log.debug("pageCounter: {} currentPage: {} targetPages: {}", pageCounter.get(), page.getUrl(), targetPages.get(0));
             page.addTargetRequests(targetPages.subList(0, 1));
         }
