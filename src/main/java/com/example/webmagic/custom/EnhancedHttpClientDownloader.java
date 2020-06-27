@@ -104,16 +104,16 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
                 todo: 若超时次数已达上限，则暂停爬取，或将本页面加入队列
                  */
                 Thread.sleep(SpiderConstant.BASE_SLEEP_INTERVAL);
-                if (!proxyService.refreshDownloaderProxy(this)) {
-                    logger.warn("暂时无法获取代理...");
-                    this.setProxyProvider(null);
-                }
+                logger.warn("暂时无法获取代理...");
+                this.setProxyProvider(null);
             }
         } else {
             /*
             todo: 进行邮件提醒
              */
             logger.error("使用本机IP爬取失败");
+            logger.debug("尝试重新获取代理...");
+            proxyService.refreshDownloaderProxy(this);
         }
     }
 

@@ -41,4 +41,8 @@ public class SpiderBootstrapper {
         proxyService.refreshDownloaderProxy(downloader);
         spider.setDownloader(downloader).run();
     }
+
+    public void kill() {
+
+    }
 }

@@ -10,7 +10,7 @@ public class SpiderConstant {
     public static final int RETRY_TIMES = 3;
     public static final int CYCLE_RETRY_TIMES = 500;
     public static final int INITIAL_CAPACITY = 20;
-    public static final int THREAD_NUM = 5;
+    public static final int THREAD_NUM = 3;
     public static final int TIME_OUT = 10000;
 
     public static final String CHARSET_UTF_8 = "utf-8";

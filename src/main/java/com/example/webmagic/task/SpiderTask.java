@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ import static com.example.webmagic.constant.UrlConstant.*;
  */
 @Component
 @Slf4j
+@EnableAsync
 @EnableScheduling
 public class SpiderTask {
     @Value("${spring.task.scheduling.delay}")
@@ -43,19 +45,19 @@ public class SpiderTask {
     @Autowired
     private SpiderBootstrapper bootstrapper;
 
-    @Async
+    @Async("taskExecutor")
     @Scheduled(cron = "${spring.task.scheduling.rule.bilibili}")
     public void initBilibiliSpiderTask() throws InterruptedException {
         initTask(BASE_URL_BILIBILI_HOT, bilibiliRankingPageProcessor, bilibiliRankingPipeline, bilibiliDataOutputPathPrefix);
     }
 
-    @Async
+    @Async("taskExecutor")
     @Scheduled(cron = "${spring.task.scheduling.rule.zhihu}")
     public void initZhihuSpiderTask() throws InterruptedException {
         initTask(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, zhihuDataOutputPathPrefix);
     }
 
-    @Async
+    @Async("taskExecutor")
     @Scheduled(cron = "${spring.task.scheduling.rule.baidu}")
     public void initBaiduBaiduTask() throws InterruptedException {
         initTask(BASE_URL_BAIDU_HOT, baiduTopPageProcessor, baiduTopPipeline, baiduDataOutputPathPrefix);

@@ -73,9 +73,9 @@ public class HttpUtil {
             log.debug("测试中...");
             final CompletableFuture<HttpResponse<String>> httpResponseCompletableFuture = httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
             statusCode = httpResponseCompletableFuture.thenApply(HttpResponse::statusCode).get();
-//            log.debug(httpRequest.uri().getHost() + ": " + statusCode);
+            log.debug("({}) testHttp()测试成功 -> {}", httpRequest.uri().getHost(), statusCode);
         } catch (InterruptedException | ExecutionException e) {
-//            log.debug(httpRequest.uri().getHost() + ": " + "HTTP测试失败", e.getMessage());
+            log.debug("({}) testHttp()测试失败 -> {}", httpRequest.uri().getHost(), e.getMessage());
         }
         return statusCode;
     }
