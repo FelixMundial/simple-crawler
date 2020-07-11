@@ -55,3 +55,6 @@ output:
   file-path-prefix:
     bilibili: data
     zhihu: data
+    baidu: data
+    douban: data
+    weibo: data

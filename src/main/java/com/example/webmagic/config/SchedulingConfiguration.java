@@ -15,19 +15,23 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class SchedulingConfiguration implements SchedulingConfigurer {
 
-    @Bean("taskExecutor")
+    @Bean("taskScheduler")
     public ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(10);
         scheduler.setThreadNamePrefix("Task-");
-        scheduler.setAwaitTerminationSeconds(30 * 60);
+        scheduler.setAwaitTerminationSeconds(30);
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
+        scheduler.setRemoveOnCancelPolicy(true);
         scheduler.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         return scheduler;
     }
 
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-//        TaskScheduler taskScheduler = taskScheduler();
-//        taskRegistrar.setTaskScheduler(taskScheduler);
+        /*
+        若不在Task方法上显式标注@Async()注解并指定ThreadPoolTaskScheduler，则只能执行阻塞式任务
+        （直接在ScheduledTaskRegistrar中配置TaskScheduler不起作用）
+         */
+//        taskRegistrar.setTaskScheduler(taskScheduler());
     }
 }

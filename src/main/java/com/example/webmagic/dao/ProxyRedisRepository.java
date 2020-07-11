@@ -2,6 +2,7 @@ package com.example.webmagic.dao;
 
 import com.example.webmagic.util.HttpUtil;
 import com.example.webmagic.util.ProxyUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,6 +20,7 @@ import static com.example.webmagic.constant.SpiderConstant.PROXY_SIZE;
  * @date 2020/6/18
  */
 @Repository
+@Slf4j
 public class ProxyRedisRepository {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -37,15 +39,16 @@ public class ProxyRedisRepository {
         String previousIp = "";
 
         /*
-        若测试超过10分钟，则放弃继续获取
+        若测试超过5分钟，则暂时放弃继续获取
          */
-        while (LocalDateTime.now().minusMinutes(10).isBefore(now)) {
+        while (LocalDateTime.now().minusMinutes(5).isBefore(now)) {
             response = HttpUtil.testHttpGet0(proxyPoolUrl);
             if (response != null && response.statusCode() == HttpStatus.OK.value()
                     && !previousIp.equals(response.body()) && ProxyUtil.validateIp((previousIp = response.body()))) {
                 return previousIp;
             }
         }
+        log.warn("测试已超时，暂时放弃继续获取！");
         return null;
     }
 

@@ -41,6 +41,8 @@ public class ProxyService {
             log.debug("代理IP已刷新：" + proxy);
             return true;
         }
+        log.warn("暂时无法获取有效代理！");
+        downloader.setProxyProvider(null);
         return false;
     }
 

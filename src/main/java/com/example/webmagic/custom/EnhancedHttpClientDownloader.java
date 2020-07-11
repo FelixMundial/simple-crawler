@@ -168,7 +168,7 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
     @Override
     public Page download(Request request, Task task) {
         if (task == null || task.getSite() == null) {
-            throw new NullPointerException("task or site can not be null");
+            throw new NullPointerException("task or site cannot be null");
         }
         CloseableHttpResponse httpResponse = null;
         CloseableHttpClient httpClient = getHttpClient(task.getSite());

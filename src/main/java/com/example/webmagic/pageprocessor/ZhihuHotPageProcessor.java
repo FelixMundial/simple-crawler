@@ -36,8 +36,7 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
 
         final String rawText = page.getRawText();
         checkContent(rawText);
-        final int hotListIndex = rawText.indexOf("\"hotList\":");
-        final String hotListString = rawText.substring(rawText.indexOf("[", hotListIndex), rawText.indexOf("]", hotListIndex) + 1);
+        String hotListString = getHotListString(rawText);
         try {
             checkContent(hotListString);
             final List<ZhihuBillboardNode> nodes = Arrays.asList(objectMapper.readValue(hotListString, ZhihuBillboardNode[].class));
@@ -121,5 +120,35 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
         if (StringUtils.isEmpty(content)) {
             throw new RuntimeException("数据为空！");
         }
+    }
+
+    /**
+     * 对json字符串进行括号匹配检测
+     *
+     * @param rawText
+     * @return
+     */
+    private String getHotListString(String rawText) {
+        Stack<Character> stack = new Stack<>();
+        final int hotListIndex = rawText.indexOf("\"hotList\":");
+        final int startIndex = rawText.indexOf("[", hotListIndex);
+        int endIndex;
+        for (endIndex = startIndex; endIndex < rawText.length(); endIndex++) {
+            if (rawText.charAt(endIndex) == '[') {
+                stack.push('[');
+            }
+            if (rawText.charAt(endIndex) == ']') {
+                stack.pop();
+                if (stack.empty() && rawText.indexOf("],\"guestFeeds\":") == endIndex) {
+                    break;
+                }
+            }
+        }
+        String hotListString = rawText.substring(startIndex, endIndex + 1);
+
+        if (!stack.empty()) {
+            hotListString += "]";
+        }
+        return hotListString;
     }
 }

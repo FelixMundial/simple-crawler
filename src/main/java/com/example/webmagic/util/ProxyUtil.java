@@ -26,6 +26,14 @@ public class ProxyUtil {
         return validateHttp("", ip, port);
     }
 
+    /**
+     * 测试代理IP
+     *
+     * @param url
+     * @param ip
+     * @param port
+     * @return
+     */
     public static boolean validateHttp(String url, String ip, String port) {
         boolean isAvailable = false;
         if (StringUtils.isEmpty(url)) {
@@ -36,10 +44,10 @@ public class ProxyUtil {
 
         final int statusCode = HttpUtil.testHttpGet(url, ip, port);
         if (statusCode == HttpStatus.OK.value()) {
-            log.debug("{} ==> {}:{} Response:200", url, ip, port);
+            log.trace("{} ==> {}:{} Response:200", url, ip, port);
             isAvailable = true;
         } else {
-            log.debug("{} ==> {}:{} Response:{}", url, ip, port, statusCode);
+            log.trace("{} ==> {}:{} Response:{}", url, ip, port, statusCode);
         }
         return isAvailable;
     }

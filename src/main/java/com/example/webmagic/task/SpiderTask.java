@@ -11,11 +11,13 @@ import com.example.webmagic.pipeline.DoubanDoulistPipeline;
 import com.example.webmagic.pipeline.ZhihuHotPipeline;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.pipeline.Pipeline;
 import us.codecraft.webmagic.processor.PageProcessor;
@@ -45,19 +47,19 @@ public class SpiderTask {
     @Autowired
     private SpiderBootstrapper bootstrapper;
 
-    @Async("taskExecutor")
+    @Async("taskScheduler")
     @Scheduled(cron = "${spring.task.scheduling.rule.bilibili}")
     public void initBilibiliSpiderTask() throws InterruptedException {
         initTask(BASE_URL_BILIBILI_HOT, bilibiliRankingPageProcessor, bilibiliRankingPipeline, bilibiliDataOutputPathPrefix);
     }
 
-    @Async("taskExecutor")
+    @Async("taskScheduler")
     @Scheduled(cron = "${spring.task.scheduling.rule.zhihu}")
     public void initZhihuSpiderTask() throws InterruptedException {
         initTask(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, zhihuDataOutputPathPrefix);
     }
 
-    @Async("taskExecutor")
+    @Async("taskScheduler")
     @Scheduled(cron = "${spring.task.scheduling.rule.baidu}")
     public void initBaiduBaiduTask() throws InterruptedException {
         initTask(BASE_URL_BAIDU_HOT, baiduTopPageProcessor, baiduTopPipeline, baiduDataOutputPathPrefix);
@@ -72,6 +74,20 @@ public class SpiderTask {
         }
         bootstrapper.run(targetUrl, pageProcessor, pipeline, dataOutputPathPrefix);
         log.info("{}Task ended", taskName);
+    }
+
+    @Qualifier("taskScheduler")
+    @Autowired
+    private ThreadPoolTaskScheduler taskScheduler;
+
+    @Async("taskScheduler")
+    @Scheduled(cron = "0 0 13 * * ?")
+    public void doTaskCleaning() {
+        int activeThreadCount = taskScheduler.getActiveCount();
+        log.info("活跃任务线程数：{}", activeThreadCount);
+//        if (activeThreadCount >= 8) {
+//            // todo: 邮件预警
+//        }
     }
 
     @Autowired
