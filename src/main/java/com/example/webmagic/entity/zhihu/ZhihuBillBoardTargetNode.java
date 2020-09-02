@@ -1,6 +1,6 @@
 package com.example.webmagic.entity.zhihu;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Map;
@@ -11,13 +11,13 @@ import java.util.Map;
  */
 @Data
 public class ZhihuBillBoardTargetNode {
-    @JsonAlias("titleArea")
+    @JsonProperty("titleArea")
     private Map titleArea;
-    @JsonAlias("excerptArea")
+    @JsonProperty("excerptArea")
     private Map excerptArea;
-    @JsonAlias("imageArea")
+    @JsonProperty("imageArea")
     private Map imageArea;
-    @JsonAlias("metricsArea")
+    @JsonProperty("metricsArea")
     private Map metricsArea;
     private Map link;
 }

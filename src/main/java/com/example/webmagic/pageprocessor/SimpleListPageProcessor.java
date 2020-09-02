@@ -16,7 +16,7 @@ import static com.example.webmagic.constant.SpiderConstant.*;
  */
 public abstract class SimpleListPageProcessor<T> implements PageProcessor {
     private final Site site = Site.me().setCharset(CHARSET_UTF_8)
-            .setTimeOut(TIME_OUT).setRetryTimes(RETRY_TIMES).setCycleRetryTimes(CYCLE_RETRY_TIMES)
+            .setTimeOut(DOWNLOADER_TIMEOUT_IN_MILLIS).setRetryTimes(MAX_RETRY_TIMES).setCycleRetryTimes(MAX_CYCLE_RETRY_TIMES)
             .setSleepTime(BASE_SLEEP_INTERVAL + new Random().nextInt(BASE_SLEEP_INTERVAL / 2))
             .setUserAgent(UserAgentFactory.getUserAgent());
 
@@ -34,7 +34,10 @@ public abstract class SimpleListPageProcessor<T> implements PageProcessor {
 
     @Override
     public void process(Page page) {
-        page.putField("items", fetchItems(page));
+        Collection<T> items;
+        if ((items = fetchItems(page)) != null) {
+            page.putField("items", items);
+        }
     }
 
     @Override

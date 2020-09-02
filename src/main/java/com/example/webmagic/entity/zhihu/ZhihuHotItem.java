@@ -1,5 +1,6 @@
 package com.example.webmagic.entity.zhihu;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,8 +24,10 @@ public class ZhihuHotItem implements Serializable {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
+    @JsonProperty("rankingNumber")
     @Column
     private String rankingNumber;
+    @JsonProperty("qImageUrl")
     @Column
     private String qImageUrl;
     @Column
@@ -35,8 +38,10 @@ public class ZhihuHotItem implements Serializable {
     private String qMetrics;
     @Column
     private String qExcerpt;
+    @JsonProperty("qAnswersCount")
     @Column
     private Integer qAnswersCount;
+    @JsonProperty("updateTime")
     @Column
     private LocalDateTime updateTime;
 }

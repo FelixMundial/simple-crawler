@@ -1,6 +1,6 @@
 package com.example.webmagic.entity.zhihu;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Map;
@@ -11,9 +11,9 @@ import java.util.Map;
  */
 @Data
 public class ZhihuBillboardNode {
-    @JsonAlias("cardId")
+    @JsonProperty("cardId")
     private String cardId;
-    @JsonAlias("feedSpecific")
+    @JsonProperty("feedSpecific")
     private Map feedSpecific;
     private ZhihuBillBoardTargetNode target;
 }

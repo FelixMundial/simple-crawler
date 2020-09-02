@@ -97,7 +97,7 @@ public class HttpUtil {
             httpGet.setHeader("Accept-Language", HEADER_ACCEPT_LANGUAGE);
             httpGet.setHeader("User-Agent", UserAgentFactory.getUserAgent());
 
-            log.debug("测试中...");
+            log.trace("测试中...");
             try (CloseableHttpResponse httpResponse = httpClient.execute(httpGet)) {
                 final int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode != HttpStatus.SC_OK) {

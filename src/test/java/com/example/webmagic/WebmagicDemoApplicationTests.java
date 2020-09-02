@@ -1,13 +1,11 @@
 package com.example.webmagic;
 
-import com.example.webmagic.dao.ProxyIpRepository;
-import com.example.webmagic.dao.ZhihuHotRepository;
 import com.example.webmagic.entry.SpiderBootstrapper;
 import com.example.webmagic.pageprocessor.BaiduTopPageProcessor;
-import com.example.webmagic.pageprocessor.DoubanDoulistPageProcessor;
+import com.example.webmagic.pageprocessor.BilibiliRankingPageProcessor;
 import com.example.webmagic.pageprocessor.ZhihuHotPageProcessor;
 import com.example.webmagic.pipeline.BaiduTopPipeline;
-import com.example.webmagic.pipeline.DoubanDoulistPipeline;
+import com.example.webmagic.pipeline.BilibiliRankingPipeline;
 import com.example.webmagic.pipeline.ZhihuHotPipeline;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -23,44 +21,27 @@ import static com.example.webmagic.constant.UrlConstant.BASE_URL_ZHIHU_HOT;
 @SpringBootTest
 class WebmagicDemoApplicationTests {
     @Value("${output.file-path-prefix.bilibili}")
-    private String dataOutputPathPrefix;
+    private String outputPathPrefix;
 
     @Autowired
-    private ZhihuHotRepository zhihuHotRepository;
-
+    SpiderBootstrapper bootstrapper;
     @Autowired
-    private SpiderBootstrapper bootstrapper;
-
+    ZhihuHotPageProcessor zhihuHotPageProcessor;
     @Autowired
-    private ZhihuHotPageProcessor zhihuHotPageProcessor;
+    BilibiliRankingPageProcessor bilibiliRankingPageProcessor;
     @Autowired
-    private ZhihuHotPipeline zhihuHotPipeline;
+    BaiduTopPageProcessor baiduTopPageProcessor;
     @Autowired
-    private DoubanDoulistPageProcessor doubanDoulistPageProcessor;
+    ZhihuHotPipeline zhihuHotPipeline;
     @Autowired
-    private DoubanDoulistPipeline doubanDoulistPipeline;
+    BilibiliRankingPipeline bilibiliRankingPipeline;
     @Autowired
-    private BaiduTopPageProcessor baiduTopPageProcessor;
-    @Autowired
-    private BaiduTopPipeline baiduTopPipeline;
+    BaiduTopPipeline baiduTopPipeline;
 
     @Test
-    public void initSpider() {
-//        bootstrapper.run(BASE_URL_DOULIST_TEST2, doubanDoulistPageProcessor, doubanDoulistPipeline, dataOutputPathPrefix);
-//        bootstrapper.run(BASE_URL_BAIDU_HOT, baiduTopPageProcessor, baiduTopPipeline, dataOutputPathPrefix);
-        bootstrapper.run(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, dataOutputPathPrefix);
+    void initTask() throws InterruptedException {
+        bootstrapper.run(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, outputPathPrefix);
+//        bootstrapper.run(BASE_URL_BILIBILI_HOT, bilibiliRankingPageProcessor, bilibiliRankingPipeline, outputPathPrefix);
+//        bootstrapper.run(BASE_URL_BAIDU_HOT, baiduTopPageProcessor, baiduTopPipeline, outputPathPrefix);
     }
-
-    //    @Autowired
-    private ProxyIpRepository proxyIpRepository;
-
-    @Test
-    public void initProxyIpSpider() {
-        /*Spider.create(new ProxyIpPageProcessor())
-                .addUrl(BASE_URL_XICIDAILI + 1)
-                .thread(THREAD_NUM).setExitWhenComplete(true)
-                .addPipeline(new ProxyIpPipeline(proxyIpRepository))
-                .run();*/
-    }
-
 }

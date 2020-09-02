@@ -15,9 +15,16 @@ spring:
     time-zone: GMT+8
     locale: zh_CN
     date-format: yyyy-MM-dd
+    serialization:
+      indent_output: true
+      fail_on_empty_beans: false
+    defaultPropertyInclusion: NON_NULL
     deserialization:
-      ACCEPT_SINGLE_VALUE_AS_ARRAY: true
-      FAIL_ON_UNKNOWN_PROPERTIES: false
+      fail_on_unknown_properties: false
+      accept_single_value_as_array: true
+    parser:
+      allow_unquoted_control_chars: true
+      allow_single_quotes: true
     property-naming-strategy: CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
   redis:
     host: [REDIS-IP]
@@ -27,11 +34,18 @@ spring:
   task:
     scheduling:
       rule:
-        bilibili: "0 * * * * *"
-        zhihu: "30 * * * * *"
-        baidu: "*/5 * * * * *"
+        bilibili: "*/4 * 0 * * *"
+        zhihu: "*/7 * 0 * * *"
+        baidu: "0 2 0 * * *"
         weibo: "*/5 * * * * *"
+        doulist: "*/5 * * * * *"
+    spider:
       delay: 0
+    execution:
+      pool:
+        allow-core-thread-timeout: on
+        max-size: 15
+        queue-capacity: 15
 
 server:
   port: 18080

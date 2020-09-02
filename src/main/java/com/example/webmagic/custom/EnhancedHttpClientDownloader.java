@@ -45,7 +45,7 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
     protected Page handleResponse(Request request, String charset, HttpResponse httpResponse, Task task) throws IOException {
         Page page = new Page();
         /*
-        若返回状态码非200，则设置为爬取失败
+        若返回状态码非200，设置为爬取失败
          */
         if (httpResponse.getStatusLine().getStatusCode() != HttpConstant.StatusCode.CODE_200) {
             page.setDownloadSuccess(false);
@@ -96,9 +96,9 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
 //            timeoutUrls.add(request.getUrl());
             proxyService.refreshDownloaderProxy(this);
             /*
-            并发问题
+            todo: 并发问题
              */
-            if (getTimeoutCount().compareAndSet(SpiderConstant.RETRY_TIMES, 0)) {
+            if (getTimeoutCount().compareAndSet(SpiderConstant.MAX_RETRY_TIMES, 0)) {
                 logger.warn("{}超时次数已达上限！", request.getUrl());
                 /*
                 todo: 若超时次数已达上限，则暂停爬取，或将本页面加入队列
