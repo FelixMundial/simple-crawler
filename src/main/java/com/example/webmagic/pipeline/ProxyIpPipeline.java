@@ -5,6 +5,8 @@ import com.example.webmagic.entity.ProxyIp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author yinfelix
  * @date 2020/6/15
@@ -44,5 +46,10 @@ public class ProxyIpPipeline extends SimpleListPersistencePipeline<ProxyIp> {
                 log.debug(ip + ":" + ipPort + "无需更新");
             }
         }
+    }
+
+    @Override
+    public void processIllegalData(List<ProxyIp> items, Throwable e) {
+
     }
 }

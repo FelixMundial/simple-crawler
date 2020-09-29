@@ -1,6 +1,5 @@
 package com.example.webmagic.service;
 
-import com.example.webmagic.custom.CustomProxyProvider;
 import com.example.webmagic.custom.EnhancedHttpClientDownloader;
 import com.example.webmagic.dao.ProxyIpRepository;
 import com.example.webmagic.dao.ProxyRedisRepository;
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import us.codecraft.webmagic.proxy.Proxy;
+import us.codecraft.webmagic.proxy.SimpleProxyProvider;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,26 +34,45 @@ public class ProxyService {
 
     public boolean refreshDownloaderProxy(EnhancedHttpClientDownloader downloader) {
         log.debug("尝试刷新代理...");
-        Proxy proxy = proxyService.getAvailableProxyByProxyPool();
-//        List<Proxy> proxies = proxyService.getAvailableProxiesByProxyPool();
-        if (proxy != null) {
-            downloader.setProxyProvider(CustomProxyProvider.from(proxy));
-            log.debug("代理IP已刷新：" + proxy);
+//        Proxy proxy = proxyService.getAvailableProxyByProxyPool();
+//        if (proxy != null) {
+//            downloader.setProxyProvider(CustomProxyProvider.from(proxy));
+//            log.debug("代理IP已刷新：" + proxy);
+//            return true;
+//        }
+        List<Proxy> proxies = proxyService.getAvailableProxyByProxyPoolAsync();
+        if (proxies != null && !proxies.isEmpty()) {
+            Proxy[] proxiesArray = proxies.toArray(new Proxy[0]);
+            downloader.setProxyProvider(SimpleProxyProvider.from(proxiesArray));
             return true;
         }
         log.warn("暂时无法获取有效代理！");
         downloader.setProxyProvider(null);
+        EnhancedHttpClientDownloader.ALLOWS_LOCAL_IP.set(true);
         return false;
     }
 
+    /**
+     * 获取单个有效代理
+     */
     public Proxy getAvailableProxyByProxyPool() {
         String ip = proxyRedisRepository.getProxyString();
         return StringUtils.isEmpty(ip) ? null : ProxyUtil.buildProxy(ip);
     }
 
+    /**
+     * 获取n个有效代理
+     */
+    public List<Proxy> getAvailableProxyByProxyPoolAsync() {
+        List<String> proxyStringList = proxyRedisRepository.getProxyStringsByNative(3);
+        return proxyStringList.isEmpty() ? null : proxyStringList.stream().map(ProxyUtil::buildProxy).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取n个代理（未验证）
+     */
     public List<Proxy> getAvailableProxiesByProxyPool() {
-        final List<String> ips = proxyRedisRepository.getProxyStrings();
-//        final List<String> ips = proxyRedisRepository.getProxyStrings0();
+        final List<String> ips = proxyRedisRepository.getProxyStrings(10);
         return ips.isEmpty() ? null : ips.stream().map(ProxyUtil::buildProxy).collect(Collectors.toList());
     }
 
@@ -61,7 +80,6 @@ public class ProxyService {
     private ProxyIpRepository proxyIpRepository;
 
     /**
-     * @return
      * @deprecated
      */
     public List<Proxy> getAvailableProxies() {
@@ -79,15 +97,6 @@ public class ProxyService {
                 }
             }
         }
-
-        /*filteredProxyIps = proxyIps.stream().filter(
-                proxyIp -> {
-                    boolean isAvailable = *//*!proxyIp.getType() &&*//* proxyIp.getValidationTime().plusMinutes(proxyIp.getSurvivingTime()).isAfter(now) && ProxyUtil.validateIp(proxyIp);
-                    if (!isAvailable) {
-                        repository.delete(proxyIp);
-                    }
-                    return isAvailable;
-                }).collect(Collectors.toList());*/
 
         if (!filteredProxyIps.isEmpty()) {
             return filteredProxyIps.stream().map(proxyIp -> new Proxy(proxyIp.getIp(), Integer.parseInt(proxyIp.getIpPort()))).collect(Collectors.toList());

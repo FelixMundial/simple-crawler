@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -52,7 +53,7 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
             logger.warn("页面{}下载被拒绝: {}", request.getUrl(), httpResponse.getStatusLine());
             proxyService.refreshDownloaderProxy(this);
         } else {
-            logger.info("🎉 页面{}下载成功～", request.getUrl());
+            logger.info("😎 页面{}下载成功～", request.getUrl());
             byte[] bytes = IOUtils.toByteArray(httpResponse.getEntity().getContent());
             String contentType = httpResponse.getEntity().getContentType() == null ? "" : httpResponse.getEntity().getContentType().getValue();
             page.setBytes(bytes);
@@ -85,33 +86,32 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
 //        return timeoutUrls;
 //    }
 
-    /**
-     * 统计超时次数和超时Url
-     */
-    @SneakyThrows
+    public static final ThreadLocal<Boolean> ALLOWS_LOCAL_IP = ThreadLocal.withInitial(() -> false);
+
     @Override
     protected void onError(Request request) {
         if (proxyProvider != null) {
             timeoutCount.incrementAndGet();
 //            timeoutUrls.add(request.getUrl());
             proxyService.refreshDownloaderProxy(this);
-            /*
-            todo: 并发问题
-             */
             if (getTimeoutCount().compareAndSet(SpiderConstant.MAX_RETRY_TIMES, 0)) {
                 logger.warn("{}超时次数已达上限！", request.getUrl());
-                /*
-                todo: 若超时次数已达上限，则暂停爬取，或将本页面加入队列
-                 */
-                Thread.sleep(SpiderConstant.BASE_SLEEP_INTERVAL);
+                try {
+                    Thread.sleep(SpiderConstant.BASE_SLEEP_INTERVAL);
+                } catch (InterruptedException ignored) {
+                }
                 logger.warn("暂时无法获取代理...");
+                /*
+                若超时次数已达上限，则暂时使用本机IP进行爬取
+                 */
                 this.setProxyProvider(null);
+                ALLOWS_LOCAL_IP.set(true);
             }
         } else {
             /*
-            todo: 进行邮件提醒
+            TODO 进行邮件提醒
              */
-            logger.error("使用本机IP爬取失败");
+            logger.error("⚠️使用本机IP爬取失败！⚠️");
             logger.debug("尝试重新获取代理...");
             proxyService.refreshDownloaderProxy(this);
         }
@@ -121,13 +121,21 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
     protected void onSuccess(Request request) {
         if (proxyProvider != null) {
             logger.debug("下一次下载将沿用本次代理～");
-        } else {
-            logger.debug("尝试重新获取代理...");
-            proxyService.refreshDownloaderProxy(this);
+        }
+        /*
+        使用本机IP进行爬取后，对同一线程下一请求再次禁用本机IP
+         */
+        else {
+            ALLOWS_LOCAL_IP.set(false);
+            /*
+            使用本机IP下载页面成功后，不再进行阻塞式代理刷新
+             */
+//            logger.debug("尝试重新获取代理...");
+//            proxyService.refreshDownloaderProxy(this);
         }
     }
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Map<String, CloseableHttpClient> httpClients = new HashMap<String, CloseableHttpClient>();
 
@@ -165,6 +173,7 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
         return httpClient;
     }
 
+    @SneakyThrows
     @Override
     public Page download(Request request, Task task) {
         if (task == null || task.getSite() == null) {
@@ -173,12 +182,25 @@ public class EnhancedHttpClientDownloader extends AbstractDownloader {
         CloseableHttpResponse httpResponse = null;
         CloseableHttpClient httpClient = getHttpClient(task.getSite());
 
-        Proxy proxy = proxyProvider != null ? proxyProvider.getProxy(task) : null;
-        if (proxy != null) {
-            logger.info("当前请求IP为：" + proxy.getHost() + ":" + proxy.getPort());
-        } else {
-            logger.warn("⚠️！！本次爬取暂时使用本机IP！！ ⚠️");
+        Proxy proxy = null;
+        /*
+        是否在每次爬取前强制获取新代理（取决于代理时效性与爬取频度，暂时关闭）
+         */
+//        proxyService.refreshDownloaderProxy(this);
+        while (proxyProvider == null) {
+            if (ALLOWS_LOCAL_IP.get()) {
+                logger.warn("本次爬取暂时使用本机IP！");
+                break;
+            } else {
+                proxyService.refreshDownloaderProxy(this);
+            }
         }
+        if (proxyProvider != null) {
+            proxy = proxyProvider.getProxy(task);
+            logger.info("当前请求IP为：" + proxy.getHost() + ":" + proxy.getPort());
+        }
+        Thread.sleep(new Random().nextInt(5) * 1000);
+
         HttpClientRequestContext requestContext = httpUriRequestConverter.convert(request, task.getSite(), proxy);
         Page page = Page.fail();
 

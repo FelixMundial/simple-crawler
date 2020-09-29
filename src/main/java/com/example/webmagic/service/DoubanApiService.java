@@ -35,7 +35,7 @@ public class DoubanApiService {
      * @return
      */
     public DoubanBook getDoubanBookInfo(String bookId) {
-        final HttpResponse<String> httpResponse = HttpUtil.testHttpGet0(UrlConstant.BASE_URL_DOUBAN_API_V2
+        final HttpResponse<String> httpResponse = HttpUtil.testHttpGetLocallyWithBody(UrlConstant.BASE_URL_DOUBAN_API_V2
                 + "book/" + bookId + "?apiKey=" + UrlConstant.getDoubanApiKey());
         log.debug("id:{} requested:{}", bookId, httpResponse.statusCode());
         final String text;

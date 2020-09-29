@@ -1,19 +1,48 @@
 package com.example.webmagic.util;
 
-import com.example.webmagic.service.DoubanApiService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("dev")
-@SpringBootTest
-class HttpUtilTest {
-    @Autowired
-    private DoubanApiService doubanApiService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+public class HttpUtilTest {
+    @Test
+    public void testApacheHttpClient() {
+
+    }
 
     @Test
-    void testHttpGet0() {
-        System.out.println(doubanApiService.getDoubanBookInfo("34920752"));
+    public void testCompletableFuture() throws ExecutionException, InterruptedException {
+        CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "f1";
+        });
+
+        f1.whenCompleteAsync((s, throwable) -> {
+            System.out.println(System.currentTimeMillis() + ":" + s);
+        });
+
+        CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "f2";
+        });
+
+        f2.whenCompleteAsync((s, throwable) -> {
+            System.out.println(System.currentTimeMillis() + ":" + s);
+        });
+
+        CompletableFuture<Object> anyOf = CompletableFuture.anyOf(f1, f2);
+        System.out.println(anyOf.get());
     }
 }

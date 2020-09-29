@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author yinfelix
  * @date 2020/6/15
@@ -24,7 +26,12 @@ public class BilibiliRankingPipeline extends SimpleListPersistencePipeline<Bilib
         if (saveResult.getId() == null) {
             log.error(bilibiliRankingItem.getVBv() + "暂时无法保存至数据库！");
         } else {
-            log.debug(bilibiliRankingItem.getVBv() + "已保存");
+            log.trace(bilibiliRankingItem.getVBv() + "已保存");
         }
+    }
+
+    @Override
+    public void processIllegalData(List<BilibiliRankingItem> items, Throwable e) {
+
     }
 }

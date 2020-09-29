@@ -16,7 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static com.example.webmagic.constant.UrlConstant.BASE_URL_ZHIHU_HOT;
 
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @Slf4j
 @SpringBootTest
 class WebmagicDemoApplicationTests {

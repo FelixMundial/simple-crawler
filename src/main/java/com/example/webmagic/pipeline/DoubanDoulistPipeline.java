@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author yinfelix
  * @date 2020/6/19
@@ -26,5 +28,10 @@ public class DoubanDoulistPipeline extends SimpleListPersistencePipeline<String>
                 operationResult = bookService.registerBook(bookId);
             } while (!operationResult);
         }
+    }
+
+    @Override
+    public void processIllegalData(List<String> items, Throwable e) {
+
     }
 }

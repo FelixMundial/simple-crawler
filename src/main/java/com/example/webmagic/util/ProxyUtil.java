@@ -13,28 +13,24 @@ import us.codecraft.webmagic.proxy.Proxy;
  */
 @Slf4j
 public class ProxyUtil {
-    public static boolean validateIp(ProxyIp proxyIp) {
-        return validateHttp(proxyIp.getIp(), proxyIp.getIpPort());
+    public static boolean validateIp(String proxyIp) {
+        final String[] ips = proxyIp.split(":");
+        return validateIp(ips[0], ips[1]);
     }
 
-    public static boolean validateIp(String fullIp) {
+    public static Proxy buildProxy(String fullIp) {
         final String[] ips = fullIp.split(":");
-        return validateHttp(ips[0], ips[1]);
+        return new Proxy(ips[0], Integer.parseInt(ips[1]));
     }
 
-    public static boolean validateHttp(String ip, String port) {
-        return validateHttp("", ip, port);
+    private static boolean validateIp(String ip, String port) {
+        return validateIp("", ip, port);
     }
 
     /**
-     * 测试代理IP
-     *
-     * @param url
-     * @param ip
-     * @param port
-     * @return
+     * 测试单个代理IP
      */
-    public static boolean validateHttp(String url, String ip, String port) {
+    private static boolean validateIp(String url, String ip, String port) {
         boolean isAvailable = false;
         if (StringUtils.isEmpty(url)) {
             url = UrlConstant.VALIDATION_URL_BAIDU;
@@ -42,7 +38,7 @@ public class ProxyUtil {
             url = url.replaceFirst("https", "http");
         }
 
-        final int statusCode = HttpUtil.testHttpGet(url, ip, port);
+        final int statusCode = HttpUtil.testHttpGetWithProxy(url, ip, port);
         if (statusCode == HttpStatus.OK.value()) {
             log.trace("{} ==> {}:{} Response:200", url, ip, port);
             isAvailable = true;
@@ -52,8 +48,10 @@ public class ProxyUtil {
         return isAvailable;
     }
 
-    public static Proxy buildProxy(String fullIp) {
-        final String[] ips = fullIp.split(":");
-        return new Proxy(ips[0], Integer.parseInt(ips[1]));
+    /**
+     * @deprecated
+     */
+    public static boolean validateIp(ProxyIp proxyIp) {
+        return validateIp(proxyIp.getIp(), proxyIp.getIpPort());
     }
 }

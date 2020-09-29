@@ -27,10 +27,26 @@ spring:
       allow_single_quotes: true
     property-naming-strategy: CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
   redis:
-    host: [REDIS-IP]
+    host: [ REDIS-IP ]
     database: 0
     password:
     port: 6379
+  rabbitmq:
+    host: [ RABBIT-IP ]
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
+    publisher-returns: true
+    template:
+      mandatory: true
+    publisher-confirm-type: simple
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 1
+        max-concurrency: 20
+        prefetch: 1
   task:
     scheduling:
       rule:
@@ -44,8 +60,8 @@ spring:
     execution:
       pool:
         allow-core-thread-timeout: on
-        max-size: 15
-        queue-capacity: 15
+        max-size: 120
+        queue-capacity: 100
 
 server:
   port: 18080

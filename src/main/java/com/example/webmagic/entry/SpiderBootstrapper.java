@@ -27,18 +27,16 @@ public class SpiderBootstrapper {
     private EnhancedHttpClientDownloader downloader;
     @Autowired
     private ProxyService proxyService;
+//    @Autowired
+//    private GlobalSpiderListener spiderListener;
 
     public void run(String targetUrl, PageProcessor pageProcessor, Pipeline pipeline, String dataOutputPathPrefix) {
         CustomSpider spider = CustomSpider.create(pageProcessor)
                 .addUrl(targetUrl)
                 .thread(MAX_THREAD_NUM).setExitWhenComplete(true)
+//                .setSpiderListeners(Collections.singletonList(spiderListener))
                 .addPipeline(new JsonFilePipeline(dataOutputPathPrefix + "/" + LocalDateTime.now(ZoneId.of(ZONEID_ASIA_SHANGHAI))))
                 .addPipeline(pipeline);
-
-        /*
-        在第一次下载前强制刷新代理
-         */
-        proxyService.refreshDownloaderProxy(downloader);
         spider.setDownloader(downloader).run();
     }
 

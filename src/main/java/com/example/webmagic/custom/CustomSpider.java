@@ -195,19 +195,20 @@ public class CustomSpider implements Runnable, Task {
                 // wait until new url added
                 waitNewUrl();
             } else {
-                threadPool.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            processRequest(request);
-                            onSuccess(request);
-                        } catch (Exception e) {
-                            onError(request);
-                            logger.error("process request " + request + " error", e);
-                        } finally {
-                            pageCount.incrementAndGet();
-                            signalNewUrl();
-                        }
+                threadPool.execute(() -> {
+                    try {
+                        processRequest(request);
+                        onSuccess(request);
+                    } catch (Exception e) {
+                        /*
+                        TODO 发生系统异常时，将失败请求加入队列进行重试
+                         */
+                        scheduler.push(request, this);
+//                        onError(request);
+                        logger.error("process request " + request + " error", e);
+                    } finally {
+                        pageCount.incrementAndGet();
+                        signalNewUrl();
                     }
                 });
             }
@@ -283,10 +284,11 @@ public class CustomSpider implements Runnable, Task {
             onDownloadSuccess(request, page);
         }
         /*
-        保证页面在爬取后一定会再次判断是否爬取异常，以便在异常时进行循环重试
+        保证页面在爬取后再次判断是否发生数据异常（非系统异常），以便进行循环重试
          */
         if (!page.isDownloadSuccess()) {
-            onDownloaderFail(request);
+            logger.debug("数据异常，尝试进行循环重试");
+            onDownloadFailure(request);
         }
     }
 
@@ -306,7 +308,7 @@ public class CustomSpider implements Runnable, Task {
         return;
     }
 
-    private void onDownloaderFail(Request request) {
+    private void onDownloadFailure(Request request) {
         if (site.getCycleRetryTimes() == 0) {
             sleep(site.getSleepTime());
         } else {

@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author yinfelix
  * @date 2020/6/20
@@ -22,7 +24,12 @@ public class BaiduTopPipeline extends SimpleListPersistencePipeline<BaiduTopItem
         if (saveResult.getId() == null) {
             log.error("「" + baiduTopItem.getIKeyword() + "」暂时无法保存至数据库！");
         } else {
-            log.debug("「" + baiduTopItem.getIKeyword() + "」已保存");
+            log.trace("「" + baiduTopItem.getIKeyword() + "」已保存");
         }
+    }
+
+    @Override
+    public void processIllegalData(List<BaiduTopItem> items, Throwable e) {
+
     }
 }

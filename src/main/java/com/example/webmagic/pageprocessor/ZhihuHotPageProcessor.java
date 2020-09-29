@@ -69,7 +69,7 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
                     if (!isStringLogged) {
                         log.warn("JSON数据metric字段出现异常：{}，所在排名：{}", node, index);
                         /*
-                        TODO 邮件预警
+                        TODO 执行邮件提醒并将异常数据缓存至Redis
                          */
                         isStringLogged = true;
                     }
@@ -82,7 +82,7 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
                 item.setUpdateTime(now);
                 hotItems.add(item);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             /*
             跳过后续pipeline，刷新代理并进行循环重试
              */
@@ -164,7 +164,7 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
                         log.error("JSON数据异常：共{}个中括号不匹配！", stack.size());
                     }
                     /*
-                    todo: 执行邮件提醒任务通知该出错数据
+                    todo: 执行邮件提醒并将异常数据缓存至Redis
                      */
                     log.error("JSON数据异常：endIndex >= rawText.length()，且startIndex为{}\n异常JSON为{}", startIndex, rawText);
                     throw new IllegalArgumentException("JSON数据异常");
@@ -172,7 +172,9 @@ public class ZhihuHotPageProcessor extends SimpleListPageProcessor<ZhihuHotItem>
                 return rawText.substring(startIndex, ++endIndex);
             }
         }
-        log.error("网页数据错误，找不到hotList字段！\n异常JSON为{}", rawText);
-        throw new IllegalArgumentException("JSON数据异常");
+        if (!rawText.contains("系统监测到您的网络环境存在异常，为保证您的正常访问，请输入验证码进行验证")) {
+            log.error("网页数据错误，找不到hotList字段！\n异常JSON为{}", ""/*rawText*/);
+        }
+        throw new RuntimeException("原始JSON数据异常");
     }
 }
