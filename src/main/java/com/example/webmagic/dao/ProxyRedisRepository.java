@@ -64,7 +64,7 @@ public class ProxyRedisRepository {
         LocalTime now = LocalTime.now();
         int offset = 0;
         /*
-        反复获取有效IP，直至成功获取或已等待超过5分钟
+        反复获取有效IP，直至成功获取或已等待超过3分钟
          */
         do {
             rawIps = redisTemplate.opsForZSet().reverseRangeByScore("proxies:universal", 10, 100, offset, maxCount);
@@ -74,7 +74,7 @@ public class ProxyRedisRepository {
                 异步测试
                  */
                 proxyStringList = HttpUtil.fetchValidatedIpsAsync(VALIDATION_URL_BAIDU, new ArrayList<>(rawIps));
-                log.debug("本批次IP测试结束，共{}个IP可用", proxyStringList.size());
+                log.debug("共{}/{}个IP可用", proxyStringList.size(), maxCount);
                 if (!proxyStringList.isEmpty()) {
                     break;
                 }
@@ -90,7 +90,7 @@ public class ProxyRedisRepository {
             } catch (InterruptedException e) {
                 log.debug("", e);
             }
-        } while (LocalTime.now().minusMinutes(5).isBefore(now));
+        } while (LocalTime.now().minusMinutes(3).isBefore(now));
         return proxyStringList;
     }
 

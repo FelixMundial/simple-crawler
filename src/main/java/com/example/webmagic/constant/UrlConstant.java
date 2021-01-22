@@ -7,7 +7,8 @@ import java.util.Random;
  * @date 2020/6/15
  */
 public class UrlConstant {
-    public static final String BASE_URL_BILIBILI_HOT = "https://www.bilibili.com/ranking/all/0/0/3";
+//    public static final String BASE_URL_BILIBILI_HOT = "https://www.bilibili.com/ranking/all/0/0/3";
+public static final String BASE_URL_BILIBILI_HOT = "https://www.bilibili.com/v/popular/rank/all";
     public static final String BASE_URL_ZHIHU_HOT = "https://www.zhihu.com/billboard";
     public static final String BASE_URL_BAIDU_HOT = "http://top.baidu.com/buzz?b=1&fr=topindex";
     public static final String BASE_URL_WEIBO_HOT = "https://s.weibo.com/top/summary/";

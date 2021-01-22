@@ -18,6 +18,7 @@ public abstract class SimpleListPageProcessor<T> implements PageProcessor {
     private final Site site = Site.me().setCharset(CHARSET_UTF_8)
             .setTimeOut(DOWNLOADER_TIMEOUT_IN_MILLIS).setRetryTimes(MAX_RETRY_TIMES).setCycleRetryTimes(MAX_CYCLE_RETRY_TIMES)
             .setSleepTime(BASE_SLEEP_INTERVAL + new Random().nextInt(BASE_SLEEP_INTERVAL / 2))
+//            .setRetrySleepTime(1000)
             .setUserAgent(UserAgentFactory.getUserAgent());
 
     public void setSiteCharset(String charset) {

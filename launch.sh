@@ -1,1 +1,1 @@
-nohup java -Dloader.path=lib -server -Xms256m -Xmx512m -jar -Dspring.profiles.active=prod webmagic-demo-0.0.1-SNAPSHOT.jar > /var/log/spider/log/wd001.txt
+nohup java -Dloader.path=lib -server -Xms512m -Xmx800m -Xmn200m -jar -Dspring.profiles.active=prod webmagic-demo-0.0.1-SNAPSHOT.jar > /var/log/spider/log/webmagic.log

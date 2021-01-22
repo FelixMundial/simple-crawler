@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.example.webmagic.constant.UrlConstant.BASE_URL_ZHIHU_HOT;
+import static com.example.webmagic.constant.UrlConstant.BASE_URL_BILIBILI_HOT;
 
 @ActiveProfiles("test")
 @Slf4j
@@ -39,9 +39,9 @@ class WebmagicDemoApplicationTests {
     BaiduTopPipeline baiduTopPipeline;
 
     @Test
-    void initTask() throws InterruptedException {
-        bootstrapper.run(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, outputPathPrefix);
-//        bootstrapper.run(BASE_URL_BILIBILI_HOT, bilibiliRankingPageProcessor, bilibiliRankingPipeline, outputPathPrefix);
+    void initTask() {
+//        bootstrapper.run(BASE_URL_ZHIHU_HOT, zhihuHotPageProcessor, zhihuHotPipeline, outputPathPrefix);
+        bootstrapper.run(BASE_URL_BILIBILI_HOT, bilibiliRankingPageProcessor, bilibiliRankingPipeline, outputPathPrefix);
 //        bootstrapper.run(BASE_URL_BAIDU_HOT, baiduTopPageProcessor, baiduTopPipeline, outputPathPrefix);
     }
 }

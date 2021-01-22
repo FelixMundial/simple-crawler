@@ -1,6 +1,11 @@
 spring:
   application:
     name: webmagic
+  cloud:
+    nacos:
+      discovery:
+        server-addr: [ NACOS-IP ]:8848
+        enabled: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
@@ -11,21 +16,6 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
     show-sql: true
-  jackson:
-    time-zone: GMT+8
-    locale: zh_CN
-    date-format: yyyy-MM-dd
-    serialization:
-      indent_output: true
-      fail_on_empty_beans: false
-    defaultPropertyInclusion: NON_NULL
-    deserialization:
-      fail_on_unknown_properties: false
-      accept_single_value_as_array: true
-    parser:
-      allow_unquoted_control_chars: true
-      allow_single_quotes: true
-    property-naming-strategy: CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
   redis:
     host: [ REDIS-IP ]
     database: 0
@@ -62,11 +52,31 @@ spring:
         allow-core-thread-timeout: on
         max-size: 120
         queue-capacity: 100
+  jackson:
+    time-zone: GMT+8
+    locale: zh_CN
+    date-format: yyyy-MM-dd
+    serialization:
+      indent_output: true
+      fail_on_empty_beans: false
+    defaultPropertyInclusion: NON_NULL
+    deserialization:
+      fail_on_unknown_properties: false
+      accept_single_value_as_array: true
+    parser:
+      allow_unquoted_control_chars: true
+      allow_single_quotes: true
+    property-naming-strategy: CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES
 
 server:
   port: 18080
   servlet:
     context-path: /webmagic
+  undertow:
+    buffer-size: 1024
+    io-threads: 32
+    worker-threads: 256
+    direct-buffers: true
 
 management:
   endpoints:

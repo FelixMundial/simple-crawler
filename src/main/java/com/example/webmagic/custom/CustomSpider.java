@@ -200,11 +200,7 @@ public class CustomSpider implements Runnable, Task {
                         processRequest(request);
                         onSuccess(request);
                     } catch (Exception e) {
-                        /*
-                        TODO 发生系统异常时，将失败请求加入队列进行重试
-                         */
-                        scheduler.push(request, this);
-//                        onError(request);
+                        onError(request);
                         logger.error("process request " + request + " error", e);
                     } finally {
                         pageCount.incrementAndGet();
@@ -222,11 +218,15 @@ public class CustomSpider implements Runnable, Task {
     }
 
     protected void onError(Request request) {
-        if (CollectionUtils.isNotEmpty(spiderListeners)) {
-            for (SpiderListener spiderListener : spiderListeners) {
-                spiderListener.onError(request);
-            }
-        }
+        /*
+        TODO 发生系统异常时，将失败请求加入队列进行重试
+         */
+        scheduler.push(request, this);
+//        if (CollectionUtils.isNotEmpty(spiderListeners)) {
+//            for (SpiderListener spiderListener : spiderListeners) {
+//                spiderListener.onError(request);
+//            }
+//        }
     }
 
     protected void onSuccess(Request request) {
@@ -284,10 +284,10 @@ public class CustomSpider implements Runnable, Task {
             onDownloadSuccess(request, page);
         }
         /*
-        保证页面在爬取后再次判断是否发生数据异常（非系统异常），以便进行循环重试
+        在页面爬取结束后再次判断是否发生数据异常（非系统异常），以便进行循环重试
          */
         if (!page.isDownloadSuccess()) {
-            logger.debug("数据异常，尝试进行循环重试");
+            logger.debug("尝试进行循环重试...");
             onDownloadFailure(request);
         }
     }

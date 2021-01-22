@@ -31,12 +31,13 @@ public class ZhihuHotPipeline extends SimpleListPersistencePipeline<ZhihuHotItem
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void processEach(ZhihuHotItem zhihuHotItem) {
+//        System.out.println(zhihuHotItem.getQTitle());
         ZhihuHotItem saveResult = repository.saveAndFlush(zhihuHotItem);
-        if (saveResult.getId() != null) {
-            log.trace(zhihuHotItem.getQId() + "已保存");
-        } else {
+        if (saveResult.getId() == null) {
             throw new RuntimeException(zhihuHotItem.getQId() + "暂时无法保存至数据库！");
-        }
+        } /*else {
+            log.debug(zhihuHotItem.getQId() + "已保存");
+        }*/
     }
 
     @Override
@@ -59,7 +60,7 @@ public class ZhihuHotPipeline extends SimpleListPersistencePipeline<ZhihuHotItem
              */
             redisTemplate.boundValueOps(itemsKey).set(parsedItems);
         } catch (Exception e) {
-            log.error("未知异常", e);
+            log.error("", e);
         }
     }
 }

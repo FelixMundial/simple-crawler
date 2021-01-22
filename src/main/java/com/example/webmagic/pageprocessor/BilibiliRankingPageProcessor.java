@@ -46,15 +46,15 @@ public class BilibiliRankingPageProcessor extends SimpleListPageProcessor<Bilibi
 
                         Selectable content = selectable.css("div.content");
                         if (content.match()) {
-                            String imageUrl = content.xpath("//div[@class='lazy-img cover']/@src").get();
-                            String title = content.xpath("//div[@class='lazy-img cover']/img/@alt").get();
-                            rankingItem.setVImageUrl(imageUrl);
-                            rankingItem.setVTitle(title);
+//                            String imageUrl = content.xpath("//div[@class='lazy-img cover']/@src").get();
+                            rankingItem.setVImageUrl("");
 
                             Selectable info = content.css("div.info");
                             if (info.match()) {
                                 String url = info.xpath("//a[@class='title']/@href").get();
                                 rankingItem.setVBv(url.split("/")[4]);
+                                String title = content.xpath("//a[@class='title']/text()").get();
+                                rankingItem.setVTitle(title);
 
                                 Selectable detail = info.css("div.detail");
                                 if (detail.match()) {

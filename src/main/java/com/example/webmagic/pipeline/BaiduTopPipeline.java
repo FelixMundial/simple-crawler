@@ -24,7 +24,7 @@ public class BaiduTopPipeline extends SimpleListPersistencePipeline<BaiduTopItem
         if (saveResult.getId() == null) {
             log.error("「" + baiduTopItem.getIKeyword() + "」暂时无法保存至数据库！");
         } else {
-            log.trace("「" + baiduTopItem.getIKeyword() + "」已保存");
+//            log.debug("「" + baiduTopItem.getIKeyword() + "」已保存");
         }
     }
 

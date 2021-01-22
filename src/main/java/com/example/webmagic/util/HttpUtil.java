@@ -178,15 +178,15 @@ public class HttpUtil {
 //                })
                             .thenApply(HttpResponse::statusCode)
                             .exceptionally(error -> {
-                                log.trace("({}) 连接失败 -> {}", proxyIp, error.getLocalizedMessage());
+                                log.debug("({}) 连接失败 -> {}", proxyIp, error.getLocalizedMessage());
                                 return HttpStatus.REQUEST_TIMEOUT.value();
                             })
                             .thenAccept(statusCode -> {
                                 if (statusCode == HttpStatus.OK.value()) {
-                                    log.trace("({}) 连接成功", proxyIp);
+                                    log.debug("({}) 连接成功", proxyIp);
                                     proxyList.add(proxyIp);
                                 } else {
-                                    log.trace("({}) 连接失败 -> {}", proxyIp, statusCode);
+                                    log.debug("({}) 连接失败 -> {}", proxyIp, statusCode);
                                 }
                             });
                 }).toArray(CompletableFuture[]::new);
@@ -194,6 +194,7 @@ public class HttpUtil {
         TODO 若使用anyOf则暂时无法排除最先返回的异常任务
          */
         CompletableFuture.allOf(futures).join();
+        log.debug("fetchValidatedIpsAsync()：{}", proxyList);
         return proxyList;
     }
 

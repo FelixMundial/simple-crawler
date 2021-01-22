@@ -48,7 +48,7 @@ public class ProxyService {
         }
         log.warn("暂时无法获取有效代理！");
         downloader.setProxyProvider(null);
-        EnhancedHttpClientDownloader.ALLOWS_LOCAL_IP.set(true);
+        EnhancedHttpClientDownloader.ALLOWS_LOCAL_IP = true;
         return false;
     }
 

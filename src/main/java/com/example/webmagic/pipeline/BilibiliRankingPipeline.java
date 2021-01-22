@@ -26,7 +26,7 @@ public class BilibiliRankingPipeline extends SimpleListPersistencePipeline<Bilib
         if (saveResult.getId() == null) {
             log.error(bilibiliRankingItem.getVBv() + "暂时无法保存至数据库！");
         } else {
-            log.trace(bilibiliRankingItem.getVBv() + "已保存");
+//            log.debug(bilibiliRankingItem.getVBv() + "已保存");
         }
     }
 
